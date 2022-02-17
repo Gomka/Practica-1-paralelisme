@@ -21,10 +21,13 @@ public class E2_TS {
 			thePongs[i].start();
 			theBangs[i].start();
 		}
-		
-		try {Thread.sleep(10000);} catch (InterruptedException ie) {}
-		
-		for (int i=0; i<HOW_MANY; i++) {
+
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException ie) {
+		}
+
+		for (int i = 0; i < HOW_MANY; i++) {
 			thePings[i].stop();
 			thePongs[i].stop();
 			theBangs[i].stop();
@@ -35,53 +38,79 @@ public class E2_TS {
 
 class Synchronizer {
 	/* declare your primitive-typed variables and constants here */
-	
+
+	private static final int CAN_PING = 1;
+	private static final int CAN_PONG = 2;
+	private static final int CAN_BANG = 3;
+
+	private int state = CAN_PING;
+
 	/* COMPLETE */
-	
+
 	AtomicBoolean accessGrantor = new AtomicBoolean(true);
-	
-	
+
 	public void letMePing() {
 		/* COMPLETE */
+		while (!accessGrantor.compareAndSet(true, false)) {
+			while (state != CAN_PING)
+				Thread.yield();
+		}
 	}
-	
-	public  void letMePong() {
+
+	public void letMePong() {
 		/* COMPLETE */
+		while (!accessGrantor.compareAndSet(true, false)) {
+			while (state != CAN_PONG)
+				Thread.yield();
+		}
 	}
-	
+
 	public void letMeBang() {
 		/* COMPLETE */
+		while (!accessGrantor.compareAndSet(true, false)) {
+			while (state != CAN_BANG)
+				Thread.yield();
+		}
 	}
 
 	public void pingDone() {
 		/* COMPLETE */
+		state = CAN_PONG;
+		accessGrantor.set(true);
 	}
 
 	public void pongDone() {
 		/* COMPLETE */
+		state = CAN_BANG;
+		accessGrantor.set(true);
 	}
-	
+
 	public void bangDone() {
 		/* COMPLETE */
+		state = CAN_PING;
+		accessGrantor.set(true);
 	}
-	
+
 }
 
-/* Classes Ping, Pong and Bang are complete. 
- * DO NOT MODIFY THEM */
+/*
+ * Classes Ping, Pong and Bang are complete.
+ * DO NOT MODIFY THEM
+ */
 
 class Ping extends Thread {
 	private int id;
 	private Synchronizer synchronizer;
-	
-	public Ping (int id, Synchronizer synchronizer) {
+
+	public Ping(int id, Synchronizer synchronizer) {
 		this.synchronizer = synchronizer;
-		this.id = id;}
-	
-	public void run () {
+		this.id = id;
+	}
+
+	public void run() {
 		while (true) {
 			synchronizer.letMePing();
-			System.out.print("PING("+id+") ");
+			System.out.print("PING(" + id + ") ");
 			synchronizer.pingDone();
 		}
 	}
@@ -90,15 +119,16 @@ class Ping extends Thread {
 class Pong extends Thread {
 	private int id;
 	private Synchronizer synchronizer;
-	
-	public Pong (int id, Synchronizer synchronizer) {
+
+	public Pong(int id, Synchronizer synchronizer) {
 		this.synchronizer = synchronizer;
-		this.id = id;}
-	
-	public void run () {
+		this.id = id;
+	}
+
+	public void run() {
 		while (true) {
 			synchronizer.letMePong();
-			System.out.print("pong("+id+") ");
+			System.out.print("pong(" + id + ") ");
 			synchronizer.pongDone();
 		}
 	}
@@ -107,17 +137,21 @@ class Pong extends Thread {
 class Bang extends Thread {
 	private int id;
 	private Synchronizer synchronizer;
-	
-	public Bang (int id, Synchronizer synchronizer) {
+
+	public Bang(int id, Synchronizer synchronizer) {
 		this.synchronizer = synchronizer;
-		this.id = id;}
-	
-	public void run () {
+		this.id = id;
+	}
+
+	public void run() {
 		while (true) {
 			synchronizer.letMeBang();
-			System.out.println("BANG!("+id+")");
+			System.out.println("BANG!(" + id + ")");
 			synchronizer.bangDone();
-			try {Thread.sleep(25);} catch (InterruptedException ie) {}
+			try {
+				Thread.sleep(25);
+			} catch (InterruptedException ie) {
+			}
 		}
 	}
 }

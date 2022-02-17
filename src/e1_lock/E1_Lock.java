@@ -43,7 +43,6 @@ class Synchronizer {
 	private static final int CAN_PING = 1;
 	private static final int CAN_PONG = 2;
 	private static final int CAN_BANG = 3;
-	private static final int WRITING = 4;
 
 	private int state = CAN_PING;
 
