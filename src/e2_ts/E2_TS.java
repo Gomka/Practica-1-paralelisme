@@ -43,7 +43,8 @@ class Synchronizer {
 	private static final int CAN_PONG = 2;
 	private static final int CAN_BANG = 3;
 
-	private int state = CAN_PING;
+	private volatile int state = CAN_PING;
+	private volatile boolean isWriting = false;
 
 	/* COMPLETE */
 
@@ -52,42 +53,48 @@ class Synchronizer {
 	public void letMePing() {
 		/* COMPLETE */
 		while (!accessGrantor.compareAndSet(true, false)) {
-			while (state != CAN_PING)
+			while (state != CAN_PING && !isWriting)
 				Thread.yield();
 		}
+		isWriting = true;
 	}
 
 	public void letMePong() {
 		/* COMPLETE */
 		while (!accessGrantor.compareAndSet(true, false)) {
-			while (state != CAN_PONG)
+			while (state != CAN_PONG && !isWriting)
 				Thread.yield();
 		}
+		isWriting = true;
 	}
 
 	public void letMeBang() {
 		/* COMPLETE */
 		while (!accessGrantor.compareAndSet(true, false)) {
-			while (state != CAN_BANG)
+			while (state != CAN_BANG && !isWriting)
 				Thread.yield();
 		}
+		isWriting = true;
 	}
 
 	public void pingDone() {
 		/* COMPLETE */
 		state = CAN_PONG;
+		isWriting = false;
 		accessGrantor.set(true);
 	}
 
 	public void pongDone() {
 		/* COMPLETE */
 		state = CAN_BANG;
+		isWriting = false;
 		accessGrantor.set(true);
 	}
 
 	public void bangDone() {
 		/* COMPLETE */
 		state = CAN_PING;
+		isWriting = false;
 		accessGrantor.set(true);
 	}
 
