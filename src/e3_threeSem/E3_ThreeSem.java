@@ -38,29 +38,57 @@ class Synchronizer {
 	// Declare your three semaphores and other simple-typed variables here
 	
 	/* COMPLETE */
+
+	private Semaphore pingSemaphore = new Semaphore(1);
+	private Semaphore pongSemaphore = new Semaphore(0); 
+	private Semaphore bangSemaphore = new Semaphore(0);
+
+	private volatile boolean isWriting = false;
+
+
 	
 	public void letMePing() {
 		/* COMPLETE */
+		while(!pingSemaphore.tryAcquire()){
+				Thread.yield();	
+		}
+		isWriting = true;
+		
+
 	}
 	
 	public  void letMePong() {
 		/* COMPLETE */
+		while(!pongSemaphore.tryAcquire()){
+				Thread.yield();	
+		}
+		isWriting = true;
 	}
 	
 	public void letMeBang() {
 		/* COMPLETE */
+		while(!bangSemaphore.tryAcquire()){
+				Thread.yield();	
+		}
+		isWriting = true;
 	}
 
 	public void pingDone() {
 		/* COMPLETE */
+		pongSemaphore.release();
+		isWriting = false;
 	}
 
 	public void pongDone() {
 		/* COMPLETE */
+		bangSemaphore.release();
+		isWriting = false;
 	}
 	
 	public void bangDone() {
 		/* COMPLETE */
+		pingSemaphore.release();
+		isWriting = false;
 	}
 	
 }
