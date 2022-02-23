@@ -36,29 +36,72 @@ class Synchronizer {
 	/* declare your primitive-typed variables here. Only primitive-typed */
 	
 	/* COMPLETE */
+
+	private static final int CAN_PING = 1;
+	private static final int CAN_PONG = 2;
+	private static final int CAN_BANG = 3;
+
+	private int state = CAN_PING;
 	
-	public void letMePing(int id) {
+	private boolean pongTwice = true;
+
+
+	public synchronized void letMePing(int id) {
 		/* COMPLETE */
+		synchronized(this){
+			if (state != CAN_PING) {
+				Thread.yield();
+			}
+		}
+		
+		
 	}
 	
-	public  void letMePong(int id) {
+	public synchronized void letMePong(int id) {
 		/* COMPLETE */
+		synchronized(this){
+			if (state != CAN_PONG) {
+				Thread.yield();
+			}
+		}
+			
+		
 	}
 	
-	public void letMeBang(int id ) {
+	public synchronized void letMeBang(int id ) {
 		/* COMPLETE */
+		synchronized(this){
+			if (state != CAN_BANG) {
+				Thread.yield();
+			}
+		}
+			
 	}
 
 	public void pingDone() {
 		/* COMPLETE */
+		synchronized(this){
+			state = CAN_PONG;
+		}
+			
+	
 	}
 
 	public void pongDone() {
 		/* COMPLETE */
+		synchronized(this){
+			state = CAN_BANG;
+		}
+			
 	}
 	
 	public void bangDone() {
 		/* COMPLETE */
+			synchronized(this){
+				state = CAN_PING;
+			}
+			
+	
 	}
 	
 }

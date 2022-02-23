@@ -43,8 +43,6 @@ class Synchronizer {
 	private Semaphore pongSemaphore = new Semaphore(0); 
 	private Semaphore bangSemaphore = new Semaphore(0);
 
-	private volatile boolean isWriting = false;
-
 
 	
 	public void letMePing() {
@@ -52,9 +50,6 @@ class Synchronizer {
 		while(!pingSemaphore.tryAcquire()){
 				Thread.yield();	
 		}
-		isWriting = true;
-		
-
 	}
 	
 	public  void letMePong() {
@@ -62,7 +57,6 @@ class Synchronizer {
 		while(!pongSemaphore.tryAcquire()){
 				Thread.yield();	
 		}
-		isWriting = true;
 	}
 	
 	public void letMeBang() {
@@ -70,25 +64,21 @@ class Synchronizer {
 		while(!bangSemaphore.tryAcquire()){
 				Thread.yield();	
 		}
-		isWriting = true;
 	}
 
 	public void pingDone() {
 		/* COMPLETE */
 		pongSemaphore.release();
-		isWriting = false;
 	}
 
 	public void pongDone() {
 		/* COMPLETE */
 		bangSemaphore.release();
-		isWriting = false;
 	}
 	
 	public void bangDone() {
 		/* COMPLETE */
 		pingSemaphore.release();
-		isWriting = false;
 	}
 	
 }
