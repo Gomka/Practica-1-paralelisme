@@ -21,10 +21,13 @@ public class E3_ThreeSem {
 			thePongs[i].start();
 			theBangs[i].start();
 		}
-		
-		try {Thread.sleep(10000);} catch (InterruptedException ie) {}
-		
-		for (int i=0; i<HOW_MANY; i++) {
+
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException ie) {
+		}
+
+		for (int i = 0; i < HOW_MANY; i++) {
 			thePings[i].stop();
 			thePongs[i].stop();
 			theBangs[i].stop();
@@ -34,35 +37,35 @@ public class E3_ThreeSem {
 }
 
 class Synchronizer {
-	
+
 	// Declare your three semaphores and other simple-typed variables here
-	
+
+	private volatile boolean firstPong = true;
+
 	/* COMPLETE */
 
 	private Semaphore pingSemaphore = new Semaphore(1);
-	private Semaphore pongSemaphore = new Semaphore(0); 
+	private Semaphore pongSemaphore = new Semaphore(0);
 	private Semaphore bangSemaphore = new Semaphore(0);
 
-
-	
 	public void letMePing() {
 		/* COMPLETE */
-		while(!pingSemaphore.tryAcquire()){
-				Thread.yield();	
+		while (!pingSemaphore.tryAcquire()) {
+			Thread.yield();
 		}
 	}
-	
-	public  void letMePong() {
+
+	public void letMePong() {
 		/* COMPLETE */
-		while(!pongSemaphore.tryAcquire()){
-				Thread.yield();	
+		while (!pongSemaphore.tryAcquire()) {
+			Thread.yield();
 		}
 	}
-	
+
 	public void letMeBang() {
 		/* COMPLETE */
-		while(!bangSemaphore.tryAcquire()){
-				Thread.yield();	
+		while (!bangSemaphore.tryAcquire()) {
+			Thread.yield();
 		}
 	}
 
@@ -73,31 +76,40 @@ class Synchronizer {
 
 	public void pongDone() {
 		/* COMPLETE */
-		bangSemaphore.release();
+		if (firstPong) {
+			pongSemaphore.release();
+			firstPong = false;
+		} else {
+			bangSemaphore.release();
+			firstPong = true;
+		}
 	}
-	
+
 	public void bangDone() {
 		/* COMPLETE */
 		pingSemaphore.release();
 	}
-	
+
 }
 
-/* Classes Ping, Pong and Bang are complete. 
- * DO NOT MODIFY THEM */
+/*
+ * Classes Ping, Pong and Bang are complete.
+ * DO NOT MODIFY THEM
+ */
 
 class Ping extends Thread {
 	private int id;
 	private Synchronizer synchronizer;
-	
-	public Ping (int id, Synchronizer synchronizer) {
+
+	public Ping(int id, Synchronizer synchronizer) {
 		this.synchronizer = synchronizer;
-		this.id = id;}
-	
-	public void run () {
+		this.id = id;
+	}
+
+	public void run() {
 		while (true) {
 			synchronizer.letMePing();
-			System.out.print("PING("+id+") ");
+			System.out.print("PING(" + id + ") ");
 			synchronizer.pingDone();
 		}
 	}
@@ -106,15 +118,16 @@ class Ping extends Thread {
 class Pong extends Thread {
 	private int id;
 	private Synchronizer synchronizer;
-	
-	public Pong (int id, Synchronizer synchronizer) {
+
+	public Pong(int id, Synchronizer synchronizer) {
 		this.synchronizer = synchronizer;
-		this.id = id;}
-	
-	public void run () {
+		this.id = id;
+	}
+
+	public void run() {
 		while (true) {
 			synchronizer.letMePong();
-			System.out.print("pong("+id+") ");
+			System.out.print("pong(" + id + ") ");
 			synchronizer.pongDone();
 		}
 	}
@@ -123,17 +136,21 @@ class Pong extends Thread {
 class Bang extends Thread {
 	private int id;
 	private Synchronizer synchronizer;
-	
-	public Bang (int id, Synchronizer synchronizer) {
+
+	public Bang(int id, Synchronizer synchronizer) {
 		this.synchronizer = synchronizer;
-		this.id = id;}
-	
-	public void run () {
+		this.id = id;
+	}
+
+	public void run() {
 		while (true) {
 			synchronizer.letMeBang();
-			System.out.println("BANG!("+id+")");
+			System.out.println("BANG!(" + id + ")");
 			synchronizer.bangDone();
-			try {Thread.sleep(25);} catch (InterruptedException ie) {}
+			try {
+				Thread.sleep(25);
+			} catch (InterruptedException ie) {
+			}
 		}
 	}
 }
