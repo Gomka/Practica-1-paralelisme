@@ -50,7 +50,7 @@ class Synchronizer {
 	private volatile boolean wantsToKill = false;
 	private volatile boolean canKill = false;
 
-	private int nextId = 1;
+	private int secondPongId  = -1;
 
 	/* COMPLETE */
 
@@ -81,7 +81,7 @@ class Synchronizer {
 			mutex.acquire();
 		} catch (InterruptedException e) {
 		}
-		while (REMAINING_PONG <= 0 || id != nextId) {
+		while (REMAINING_PONG <= 0 || (id != secondPongId && secondPongId != -1)) {
 			mutex.release();
 			Thread.yield();
 			try {
@@ -109,12 +109,13 @@ class Synchronizer {
 	public void pingDone() {
 		REMAINING_PING = 0;
 		REMAINING_PONG = 2;
+		secondPongId = -1;
 		mutex.release();
 	}
 
 	public void pongDone(int id) {
 		/* COMPLETE */
-		nextId = (id + 1) % numPongs;
+		secondPongId = (id + 1) % numPongs;
 		REMAINING_PONG--;
 		if (REMAINING_PONG <= 0) {
 			if (wantsToKill && id == 0)
@@ -141,7 +142,7 @@ class Synchronizer {
 		} catch (InterruptedException e) {
 		}
 
-		while (!canKill) {
+		while (!canKill ) {
 			mutex.release();
 			Thread.yield();
 			try {
