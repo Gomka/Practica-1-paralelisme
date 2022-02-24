@@ -218,6 +218,7 @@ class SerialBangKiller extends Thread {
 class Bang extends Thread {
 	private int id;
 	private Synchronizer synchronizer;
+	boolean alive = true;
 
 	public Bang(int id, Synchronizer synchronizer) {
 		this.synchronizer = synchronizer;
@@ -226,12 +227,12 @@ class Bang extends Thread {
 
 	public void syncStop() {
 		/* COMPLETE */
-		this.stop();
+		alive = false;
 	}
 
 	public void run() {
 		/* COMPLETE */
-		while (true) {
+		while (alive) {
 			synchronizer.letMeBang();
 			System.out.println("BANG!(" + id + ")");
 			synchronizer.bangDone();
