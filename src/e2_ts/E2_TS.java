@@ -39,62 +39,49 @@ public class E2_TS {
 class Synchronizer {
 	/* declare your primitive-typed variables and constants here */
 
-	private static final int CAN_PING = 1;
-	private static final int CAN_PONG = 2;
-	private static final int CAN_BANG = 3;
-
-	private volatile int state = CAN_PING;
-	private volatile boolean isWriting = false;
-
-	/* COMPLETE */
+	private volatile int REMAINING_PING = 1;
+	private volatile int REMAINING_PONG = 0;
+	private volatile int REMAINING_BANG = 0;
 
 	AtomicBoolean accessGrantor = new AtomicBoolean(true);
 
 	public void letMePing() {
-		/* COMPLETE */
-		while (!accessGrantor.compareAndSet(true, false)) {
-			while (state != CAN_PING && !isWriting)
+		while (REMAINING_PING <=0 || !accessGrantor.compareAndSet(true, false)) {
 				Thread.yield();
 		}
-		isWriting = true;
 	}
 
 	public void letMePong() {
-		/* COMPLETE */
-		while (!accessGrantor.compareAndSet(true, false)) {
-			while (state != CAN_PONG && !isWriting)
+		while (REMAINING_PONG <=0 || !accessGrantor.compareAndSet(true, false)) {
 				Thread.yield();
 		}
-		isWriting = true;
 	}
 
 	public void letMeBang() {
-		/* COMPLETE */
-		while (!accessGrantor.compareAndSet(true, false)) {
-			while (state != CAN_BANG && !isWriting)
+		while (REMAINING_BANG <=0 || !accessGrantor.compareAndSet(true, false)) {
 				Thread.yield();
 		}
-		isWriting = true;
 	}
 
 	public void pingDone() {
-		/* COMPLETE */
-		state = CAN_PONG;
-		isWriting = false;
+		REMAINING_PING = 0;
+		REMAINING_PONG = 2;
+		Thread.yield();
 		accessGrantor.set(true);
 	}
 
 	public void pongDone() {
-		/* COMPLETE */
-		state = CAN_BANG;
-		isWriting = false;
+		REMAINING_PONG--;
+		if (REMAINING_PONG <= 0)
+			REMAINING_BANG = 1;
+		Thread.yield();
 		accessGrantor.set(true);
 	}
 
 	public void bangDone() {
-		/* COMPLETE */
-		state = CAN_PING;
-		isWriting = false;
+		REMAINING_BANG = 0;
+		REMAINING_PING = 1;
+		Thread.yield();
 		accessGrantor.set(true);
 	}
 
