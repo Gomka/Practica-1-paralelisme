@@ -21,7 +21,7 @@ public class E4_ImplLock {
 		}
 
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(1000);
 		} catch (InterruptedException ie) {
 		}
 
@@ -36,62 +36,69 @@ public class E4_ImplLock {
 
 class Synchronizer {
 	/* declare your primitive-typed variables here. Only primitive-typed */
-
-	/* COMPLETE */
-
 	private int REMAINING_PING = 1;
 	private int REMAINING_PONG = 0;
 	private int REMAINING_BANG = 0;
+	private boolean MUST_PRINT = false;
 
 	public void letMePing(int id) {
-		/* COMPLETE */
-		synchronized (this) {
-			while (REMAINING_PING <= 0) {
-				Thread.yield();
+		while (true) {
+			synchronized (this) {
+				if (!MUST_PRINT && REMAINING_PING > 0) {
+					MUST_PRINT = true;
+					return;
+				}
 			}
+			Thread.yield();
 		}
 	}
 
 	public void letMePong(int id) {
-		/* COMPLETE */
-		synchronized (this) {
-			while (REMAINING_PONG <= 0) {
-				Thread.yield();
+		while (true) {
+			synchronized (this) {
+				if (!MUST_PRINT && REMAINING_PONG > 0) {
+					MUST_PRINT = true;
+					return;
+				}
 			}
+			Thread.yield();
 		}
 	}
 
 	public void letMeBang(int id) {
-		/* COMPLETE */
-		synchronized (this) {
-			while (REMAINING_BANG <= 0) {
-				Thread.yield();
+		while (true) {
+			synchronized (this) {
+				if (!MUST_PRINT && REMAINING_BANG > 0) {
+					MUST_PRINT = true;
+					return;
+				}
 			}
+			Thread.yield();
 		}
 	}
 
 	public void pingDone() {
-		/* COMPLETE */
 		synchronized (this) {
 			REMAINING_PING = 0;
 			REMAINING_PONG = 2;
+			MUST_PRINT = false;
 		}
 	}
 
 	public void pongDone() {
-		/* COMPLETE */
 		synchronized (this) {
 			REMAINING_PONG--;
 			if (REMAINING_PONG <= 0)
 				REMAINING_BANG = 1;
+			MUST_PRINT = false;
 		}
 	}
 
 	public void bangDone() {
-		/* COMPLETE */
 		synchronized (this) {
 			REMAINING_BANG = 0;
 			REMAINING_PING = 1;
+			MUST_PRINT = false;
 		}
 	}
 
