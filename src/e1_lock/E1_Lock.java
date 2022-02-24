@@ -40,21 +40,15 @@ public class E1_Lock {
 class Synchronizer {
 	/* declare your primitive-typed variables and constants here */
 
-	private static final int CAN_PING = 1;
-	private static final int CAN_PONG = 2;
-	private static final int CAN_BANG = 3;
-
-	private int state = CAN_PING;
-
-	/* COMPLETE */
+	private int REMAINING_PING = 1;
+	private int REMAINING_PONG = 0;
+	private int REMAINING_BANG = 0;
 
 	Lock accessGrantor = new ReentrantLock(true);
 
 	public void letMePing() {
-		/* COMPLETE */
-
 		accessGrantor.lock();
-		while (state != CAN_PING) {
+		while (REMAINING_PING <= 0) {
 			accessGrantor.unlock();
 			Thread.yield();
 			accessGrantor.lock();
@@ -62,10 +56,8 @@ class Synchronizer {
 	}
 
 	public void letMePong() {
-		/* COMPLETE */
-
 		accessGrantor.lock();
-		while (state != CAN_PONG) {
+		while (REMAINING_PONG <= 0) {
 			accessGrantor.unlock();
 			Thread.yield();
 			accessGrantor.lock();
@@ -73,10 +65,8 @@ class Synchronizer {
 	}
 
 	public void letMeBang() {
-		/* COMPLETE */
-
 		accessGrantor.lock();
-		while (state != CAN_BANG) {
+		while (REMAINING_BANG <= 0) {
 			accessGrantor.unlock();
 			Thread.yield();
 			accessGrantor.lock();
@@ -84,20 +74,21 @@ class Synchronizer {
 	}
 
 	public void pingDone() {
-		/* COMPLETE */
-		state = CAN_PONG;
+		REMAINING_PING = 0;
+		REMAINING_PONG = 2;
 		accessGrantor.unlock();
 	}
 
 	public void pongDone() {
-		/* COMPLETE */
-		state = CAN_BANG;
+		REMAINING_PONG--;
+		if (REMAINING_PONG <= 0)
+			REMAINING_BANG = 1;
 		accessGrantor.unlock();
 	}
 
 	public void bangDone() {
-		/* COMPLETE */
-		state = CAN_PING;
+		REMAINING_BANG = 0;
+		REMAINING_PING = 1;
 		accessGrantor.unlock();
 	}
 
