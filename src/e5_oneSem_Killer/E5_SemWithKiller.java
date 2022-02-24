@@ -49,7 +49,6 @@ class Synchronizer {
 	private volatile int REMAINING_BANG = 0;
 	private volatile boolean wantsToKill = false;
 	private volatile boolean canKill = false;
-	public volatile boolean noMoreTargets = false;
 
 	private int secondPongId = -1;
 
@@ -136,8 +135,7 @@ class Synchronizer {
 	}
 
 	public void letMeKill() {
-		if (!noMoreTargets)
-			wantsToKill = true;
+		wantsToKill = true;
 
 		try {
 			mutex.acquire();
@@ -191,12 +189,11 @@ class SerialBangKiller extends Thread {
 		System.out.println();
 		System.out.println();
 
-		theBangs[nextBangToKill].syncStop();
-		if (nextBangToKill < theBangs.length - 2) {
+		if (nextBangToKill < theBangs.length - 1) {
+			theBangs[nextBangToKill].syncStop();
 			nextBangToKill++;
 			System.out.print("\tBYE-BYE BANG ");
 		} else {
-			synchronizer.noMoreTargets = true;
 			System.out.print("\tBANGs ALREADY AT BAY ");
 		}
 
