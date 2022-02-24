@@ -50,22 +50,25 @@ class Synchronizer {
 
 	public void letMePing() {
 		/* COMPLETE */
-		while (!pingSemaphore.tryAcquire()) {
-			Thread.yield();
+		try {
+			pingSemaphore.acquire();
+		} catch (Exception e) {
 		}
 	}
 
 	public void letMePong() {
 		/* COMPLETE */
-		while (!pongSemaphore.tryAcquire()) {
-			Thread.yield();
+		try {
+			pongSemaphore.acquire();
+		} catch (Exception e) {
 		}
 	}
 
 	public void letMeBang() {
 		/* COMPLETE */
-		while (!bangSemaphore.tryAcquire()) {
-			Thread.yield();
+		try {
+			bangSemaphore.acquire();
+		} catch (Exception e) {
 		}
 	}
 
