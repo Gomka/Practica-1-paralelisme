@@ -40,12 +40,15 @@ class Synchronizer {
 	private int REMAINING_PONG = 0;
 	private int REMAINING_BANG = 0;
 	private boolean MUST_PRINT = false;
+	private int pingId = -1;
+	private int pongId = -1;
 
 	public void letMePing(int id) {
 		while (true) {
 			synchronized (this) {
 				if (!MUST_PRINT && REMAINING_PING > 0) {
 					MUST_PRINT = true;
+					pingId = id;
 					return;
 				}
 			}
@@ -57,8 +60,18 @@ class Synchronizer {
 		while (true) {
 			synchronized (this) {
 				if (!MUST_PRINT && REMAINING_PONG > 0) {
-					MUST_PRINT = true;
-					return;
+					
+					if (REMAINING_PONG == 1 && id != pingId) {
+						pongId = id;
+						MUST_PRINT = true;
+						return;
+					}
+					
+					if (REMAINING_PONG == 2 && id == pingId) {
+						MUST_PRINT = true;
+						return;
+					}
+
 				}
 			}
 			Thread.yield();
@@ -68,7 +81,7 @@ class Synchronizer {
 	public void letMeBang(int id) {
 		while (true) {
 			synchronized (this) {
-				if (!MUST_PRINT && REMAINING_BANG > 0) {
+				if (!MUST_PRINT && REMAINING_BANG > 0 && id == pongId) {
 					MUST_PRINT = true;
 					return;
 				}
