@@ -130,6 +130,24 @@ class SerialBangKiller extends Thread {
 	public void run() {
 		while (true) {
 			/* COMPLETE */
+			synchronizer.letMeKill();
+
+			System.out.println("\n ------------- Ha muerto (" + nextBangToKill + ")");
+			theBangs[nextBangToKill].syncStop();
+			if (nextBangToKill < 10)
+				nextBangToKill++;
+
+			synchronizer.killingDone();
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException ie) {
+			}
+
+			synchronizer.killingDone();
+			try {
+				Thread.sleep(25);
+			} catch (InterruptedException ie) {
+			}
 		}
 	}
 }
@@ -142,7 +160,7 @@ class SerialBangKiller extends Thread {
 class Bang extends Thread {
 	private int id;
 	private Synchronizer synchronizer;
-	private volatile boolean alive;
+	private boolean alive;
 
 	public Bang(int id, Synchronizer synchronizer) {
 		this.synchronizer = synchronizer;
@@ -153,6 +171,7 @@ class Bang extends Thread {
 	public void syncStop() {
 		/* COMPLETE */
 		alive = false;
+		this.stop();
 	}
 
 	public void run() {
