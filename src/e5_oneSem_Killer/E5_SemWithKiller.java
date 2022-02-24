@@ -50,7 +50,7 @@ class Synchronizer {
 	private volatile boolean wantsToKill = false;
 	private volatile boolean canKill = false;
 
-	private int nextId = 0;
+	private int nextId = 1;
 
 	/* COMPLETE */
 
@@ -62,29 +62,47 @@ class Synchronizer {
 	}
 
 	public void letMePing() {
-		try { mutex.acquire(); } catch (InterruptedException e) { }
+		try {
+			mutex.acquire();
+		} catch (InterruptedException e) {
+		}
 		while (REMAINING_PING <= 0) {
 			mutex.release();
 			Thread.yield();
-			try { mutex.acquire(); } catch (InterruptedException e) { }
+			try {
+				mutex.acquire();
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
 	public void letMePong(int id) {
-		try { mutex.acquire(); } catch (InterruptedException e) { }
+		try {
+			mutex.acquire();
+		} catch (InterruptedException e) {
+		}
 		while (REMAINING_PONG <= 0 || id != nextId) {
 			mutex.release();
 			Thread.yield();
-			try { mutex.acquire(); } catch (InterruptedException e) { }
+			try {
+				mutex.acquire();
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
 	public void letMeBang() {
-		try { mutex.acquire(); } catch (InterruptedException e) { }
+		try {
+			mutex.acquire();
+		} catch (InterruptedException e) {
+		}
 		while (REMAINING_BANG <= 0) {
 			mutex.release();
 			Thread.yield();
-			try { mutex.acquire(); } catch (InterruptedException e) { }
+			try {
+				mutex.acquire();
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
@@ -99,12 +117,12 @@ class Synchronizer {
 		nextId = (id + 1) % numPongs;
 		REMAINING_PONG--;
 		if (REMAINING_PONG <= 0) {
-			if (!wantsToKill)
-				REMAINING_BANG = 1;
-			else
+			if (wantsToKill && id == 0)
 				canKill = true;
+			else
+				REMAINING_BANG = 1;
 		}
-			
+
 		mutex.release();
 	}
 
@@ -116,20 +134,27 @@ class Synchronizer {
 	}
 
 	public void letMeKill() {
-		try { mutex.acquire(); } catch (InterruptedException e) { }
 		wantsToKill = true;
+
+		try {
+			mutex.acquire();
+		} catch (InterruptedException e) {
+		}
+
 		while (!canKill) {
 			mutex.release();
 			Thread.yield();
-			try { mutex.acquire(); } catch (InterruptedException e) { }
+			try {
+				mutex.acquire();
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
 	public void killingDone() {
 		wantsToKill = false;
 		canKill = false;
-		REMAINING_PING = 1;
-		mutex.release();
+		bangDone();
 	}
 
 }
@@ -147,26 +172,40 @@ class SerialBangKiller extends Thread {
 
 	public void run() {
 		while (true) {
-			try { Thread.sleep(500); } catch (InterruptedException ie) { }
-			
-			synchronizer.letMeKill();
-			System.out.println();
-			System.out.println();
-			System.out.print("\tBYE-BYE BANG ");
-			for (int i = 9; i >= 0; i--) {
-				try { Thread.sleep(100); } catch (InterruptedException e) { }
-				System.out.print(i + " ");
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException ie) {
 			}
-			System.out.println();
-			System.out.println();
-			
-			theBangs[nextBangToKill].syncStop();
-			if (nextBangToKill < 10)
-				nextBangToKill++;
 
+			synchronizer.letMeKill();
+			Assasinate();
 			synchronizer.killingDone();
 
 		}
+	}
+
+	public void Assasinate() {
+		System.out.println();
+		System.out.println();
+
+		theBangs[nextBangToKill].syncStop();
+		if (nextBangToKill < 8) {
+			nextBangToKill++;
+			System.out.print("\tBYE-BYE BANG ");
+		} else {
+			System.out.print("\tBANGs ALREADY AT BAY ");
+		}
+
+		for (int i = 9; i >= 0; i--) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+			System.out.print(i + " ");
+		}
+		System.out.println();
+		System.out.println();
+
 	}
 }
 
