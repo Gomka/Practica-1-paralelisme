@@ -45,28 +45,48 @@ class Synchronizer {
 
 	AtomicBoolean accessGrantor = new AtomicBoolean(true);
 
-	public void letMePing() {
-		while (REMAINING_PING <=0 || !accessGrantor.compareAndSet(true, false)) {
-				Thread.yield();
+	public void letMePing() {		
+		while (true) {
+			if (accessGrantor.compareAndSet(true, false)) {
+				if (REMAINING_PING <=0) {
+					accessGrantor.set(true);
+				} else {
+					return;
+				}
+			}
+			Thread.yield();
 		}
 	}
 
 	public void letMePong() {
-		while (REMAINING_PONG <=0 || !accessGrantor.compareAndSet(true, false)) {
-				Thread.yield();
+		while (true) {
+			if (accessGrantor.compareAndSet(true, false)) {
+				if (REMAINING_PONG <=0) {
+					accessGrantor.set(true);
+				} else {
+					return;
+				}
+			}
+			Thread.yield();
 		}
 	}
 
 	public void letMeBang() {
-		while (REMAINING_BANG <=0 || !accessGrantor.compareAndSet(true, false)) {
-				Thread.yield();
+		while (true) {
+			if (accessGrantor.compareAndSet(true, false)) {
+				if (REMAINING_BANG <=0) {
+					accessGrantor.set(true);
+				} else {
+					return;
+				}
+			}
+			Thread.yield();
 		}
 	}
 
 	public void pingDone() {
 		REMAINING_PING = 0;
 		REMAINING_PONG = 2;
-		Thread.yield();
 		accessGrantor.set(true);
 	}
 
@@ -74,14 +94,12 @@ class Synchronizer {
 		REMAINING_PONG--;
 		if (REMAINING_PONG <= 0)
 			REMAINING_BANG = 1;
-		Thread.yield();
 		accessGrantor.set(true);
 	}
 
 	public void bangDone() {
 		REMAINING_BANG = 0;
 		REMAINING_PING = 1;
-		Thread.yield();
 		accessGrantor.set(true);
 	}
 
