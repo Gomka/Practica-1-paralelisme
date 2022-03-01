@@ -26,6 +26,7 @@ public class PsychedelicLabel extends JLabel implements Runnable {
 		while (true) {
 			this.setBackground(GetRandomColor());
 			try { Thread.sleep(100-syncronizer.speed); } catch (InterruptedException e) { }
+			while (syncronizer.isSuspended) {Thread.yield();}
 		}
 	}
 	

@@ -12,8 +12,8 @@ import javax.swing.event.ChangeListener;
 public class E6_Psychedelia {
 	public static void main(String args[]) {
 		
-		Synchronizer syncronizer = new Synchronizer();
-		Thread[] labels = new Thread[5];
+		final Synchronizer syncronizer = new Synchronizer();
+		final Thread[] labels = new Thread[5];
 		
 		JFrame frame = new JFrame("My First GUI");
 		//frame.setLayout(new FlowLayout());
@@ -25,7 +25,6 @@ public class E6_Psychedelia {
 			PsychedelicLabel label = new PsychedelicLabel(syncronizer);
 			labels[i] = new Thread(label);
 			frame.add(label);
-			labels[i].start();
 		}
 		
 		JSlider slider = new JSlider();
@@ -35,6 +34,9 @@ public class E6_Psychedelia {
 		btnGO.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("GO");
+				for (int i = 0; i < labels.length; i++) {
+					labels[i].start();
+				}
 			}
 		});
 		frame.add(btnGO);
@@ -42,6 +44,7 @@ public class E6_Psychedelia {
 		btnSUSPEND.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("SUSPEND");
+				syncronizer.isSuspended = true;
 			}
 		});
 		frame.add(btnSUSPEND);
@@ -49,6 +52,7 @@ public class E6_Psychedelia {
 		btnRESUME.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("RESUME");
+				syncronizer.isSuspended = false;
 			}
 		});
 		frame.add(btnRESUME);
@@ -56,6 +60,9 @@ public class E6_Psychedelia {
 		btnSTOP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("STOP");
+				for (int i = 0; i < labels.length; i++) {
+					labels[i].stop();
+				}
 			}
 		});
 		frame.add(btnSTOP);
@@ -82,5 +89,6 @@ class SliderListener implements ChangeListener {
 }
 
 class Synchronizer {
+	protected boolean isSuspended = false;
 	public int speed = 50;
 }
