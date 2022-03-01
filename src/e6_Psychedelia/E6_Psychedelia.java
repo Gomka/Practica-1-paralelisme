@@ -12,6 +12,7 @@ import javax.swing.event.ChangeListener;
 public class E6_Psychedelia {
 	public static void main(String args[]) {
 		
+		Synchronizer syncronizer = new Synchronizer();
 		Thread[] labels = new Thread[5];
 		
 		JFrame frame = new JFrame("My First GUI");
@@ -21,14 +22,14 @@ public class E6_Psychedelia {
 		frame.setSize(450, 450);
 	
 		for (int i = 0; i < labels.length; i++) {
-			PsychedelicLabel label = new PsychedelicLabel();
+			PsychedelicLabel label = new PsychedelicLabel(syncronizer);
 			labels[i] = new Thread(label);
 			frame.add(label);
 			labels[i].start();
 		}
 		
 		JSlider slider = new JSlider();
-		slider.addChangeListener(new SliderListener());
+		slider.addChangeListener(new SliderListener(syncronizer));
 		frame.add(slider);
 		JButton btnGO = new JButton("GO");
 		btnGO.addActionListener(new ActionListener() {
@@ -64,12 +65,22 @@ public class E6_Psychedelia {
 
 class SliderListener implements ChangeListener {
 	
-	
+	Synchronizer syncronizer;
+
+	public SliderListener(Synchronizer syncronizer) {
+		this.syncronizer = syncronizer;
+	}
+
 	public void stateChanged(ChangeEvent e) {
 		JSlider source = (JSlider) e.getSource();
 		if (!source.getValueIsAdjusting()) {
 			int value = (int) source.getValue();
 			System.out.println("New Slider Value: " + value);
+			syncronizer.speed = value;
 		}
 	}
+}
+
+class Synchronizer {
+	public int speed = 50;
 }

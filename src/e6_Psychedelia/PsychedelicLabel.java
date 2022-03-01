@@ -8,8 +8,10 @@ public class PsychedelicLabel extends JLabel implements Runnable {
 
 	private int speed = 50;
 	private Random alea;
+	Synchronizer syncronizer;
 	
-	public PsychedelicLabel () {
+	public PsychedelicLabel (Synchronizer syncronizer) {
+		this.syncronizer = syncronizer;
 		this.setOpaque(true);
 		this.alea = new Random();
 		this.setText("PsyLabel");
@@ -23,7 +25,7 @@ public class PsychedelicLabel extends JLabel implements Runnable {
 	public void run () {
 		while (true) {
 			this.setBackground(GetRandomColor());
-			try { Thread.sleep(100-speed); } catch (InterruptedException e) { }
+			try { Thread.sleep(100-syncronizer.speed); } catch (InterruptedException e) { }
 		}
 	}
 	
