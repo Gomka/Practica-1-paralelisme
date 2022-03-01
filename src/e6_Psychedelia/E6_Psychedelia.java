@@ -26,43 +26,62 @@ public class E6_Psychedelia {
 			labels[i] = new Thread(label);
 			frame.add(label);
 		}
-		
-		JSlider slider = new JSlider();
+
+		JSlider slider = new JSlider();		
+		final JButton btnGO = new JButton("GO");
+		final JButton btnSUSPEND = new JButton("SUSPEND");
+		final JButton btnRESUME = new JButton("RESUME");
+		final JButton btnSTOP = new JButton("STOP");
+
+		btnSUSPEND.setEnabled(false);
+		btnRESUME.setEnabled(false);
+		btnSTOP.setEnabled(false);
+
 		slider.addChangeListener(new SliderListener(syncronizer));
 		frame.add(slider);
-		JButton btnGO = new JButton("GO");
+
 		btnGO.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				btnGO.setEnabled(false);
 				System.out.println("GO");
 				for (int i = 0; i < labels.length; i++) {
 					labels[i].start();
 				}
+				btnSUSPEND.setEnabled(true);
+				btnSTOP.setEnabled(true);
 			}
 		});
 		frame.add(btnGO);
-		JButton btnSUSPEND = new JButton("SUSPEND");
+
 		btnSUSPEND.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				btnSUSPEND.setEnabled(false);
+				btnRESUME.setEnabled(true);
 				System.out.println("SUSPEND");
 				syncronizer.isSuspended = true;
 			}
 		});
 		frame.add(btnSUSPEND);
-		JButton btnRESUME = new JButton("RESUME");
+
 		btnRESUME.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				btnSUSPEND.setEnabled(true);
+				btnRESUME.setEnabled(false);
 				System.out.println("RESUME");
 				syncronizer.isSuspended = false;
 			}
 		});
 		frame.add(btnRESUME);
-		JButton btnSTOP = new JButton("STOP");
+
 		btnSTOP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				btnSUSPEND.setEnabled(false);
+				btnRESUME.setEnabled(false);
 				System.out.println("STOP");
 				for (int i = 0; i < labels.length; i++) {
 					labels[i].stop();
 				}
+				btnSTOP.setEnabled(false);
 			}
 		});
 		frame.add(btnSTOP);
@@ -89,7 +108,7 @@ class SliderListener implements ChangeListener {
 }
 
 class Synchronizer {
-	// No se ha realizado ningún tipo de protección porqué los "PsychedelicLabel" solo leen y los botones solo escriben
+	// No se ha realizado ningï¿½n tipo de protecciï¿½n porquï¿½ los "PsychedelicLabel" solo leen y los botones solo escriben
 	protected boolean isSuspended = false;
 	public int speed = 50;
 }
