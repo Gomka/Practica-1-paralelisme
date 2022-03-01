@@ -89,6 +89,7 @@ class SliderListener implements ChangeListener {
 }
 
 class Synchronizer {
+	// No se ha realizado ningún tipo de protección porqué los "PsychedelicLabel" solo leen y los botones solo escriben
 	protected boolean isSuspended = false;
 	public int speed = 50;
 }
