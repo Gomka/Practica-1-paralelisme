@@ -11,14 +11,22 @@ import javax.swing.event.ChangeListener;
 
 public class E6_Psychedelia {
 	public static void main(String args[]) {
+		
+		Thread[] labels = new Thread[5];
+		
 		JFrame frame = new JFrame("My First GUI");
-		// frame.setLayout(new FlowLayout());
+		//frame.setLayout(new FlowLayout());
 		frame.setLayout(new GridLayout(2, 0));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(450, 450);
-		frame.add(new PsychedelicLabel());
-		frame.add(new PsychedelicLabel());
-		frame.add(new PsychedelicLabel());
+	
+		for (int i = 0; i < labels.length; i++) {
+			PsychedelicLabel label = new PsychedelicLabel();
+			labels[i] = new Thread(label);
+			frame.add(label);
+			labels[i].start();
+		}
+		
 		JSlider slider = new JSlider();
 		slider.addChangeListener(new SliderListener());
 		frame.add(slider);
@@ -55,6 +63,8 @@ public class E6_Psychedelia {
 }
 
 class SliderListener implements ChangeListener {
+	
+	
 	public void stateChanged(ChangeEvent e) {
 		JSlider source = (JSlider) e.getSource();
 		if (!source.getValueIsAdjusting()) {
